@@ -1,15 +1,16 @@
 export default {
-  "index": "Introduction",
-  "authentication": "Authentication",
-  "esims": "eSIMs Module",
-  "webhooks": "Webhooks Module",
-  "gift-cards": "Gift Cards Module",
-  "affiliate": "Affiliate Module",
-  "health": "Health Check",
-  "about": "About eSIM API",
-  "contact": {
-    title: "Contact",
-    type: "page",
-    href: "https://partner.getroamify.com/sign-up",
-  }
+    "index": "Introduction",
+    "authentication": "Authentication",
+    "esims": "eSIMs Module",
+    "webhooks": "Webhooks Module",
+    "gift-cards": "Gift Cards Module",
+    "affiliate": "Affiliate Module",
+    "exchange-rates": "Exchange Rates",
+    "health": "Health Check",
+    "about": "About eSIM API",
+    "contact": {
+        title: "Contact",
+        type: "page",
+        href: "https://partner.getroamify.com/sign-up",
+    }
 }

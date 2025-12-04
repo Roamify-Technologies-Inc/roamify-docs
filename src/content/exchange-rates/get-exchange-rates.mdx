@@ -1,0 +1,139 @@
+import { Tabs } from 'nextra/components';
+
+# Get Exchange Rates
+
+## Table of Contents
+- [Get latest exchange rates](#get-latest-exchange-rates)
+- [Conver Currency](#convert-currency)
+- [Get Historical Exchange Rates](#get-historical-exchange-rates)
+
+## Get latest exchange rates
+To get the latest exchange rates, you need to send a `GET` request to the `/api/rates` endpoint.
+
+The request parameters does not require any parameters.
+
+## Usage - fetch all latest exchange rates
+Here is an example of how to fetch all latest exchange rates using curl and JavaScript (Axios):
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/rates' \
+        --header 'Authorization: Bearer Access Token' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/rates', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Convert Currency
+To convert an amount from one currency to another, you need to send a `GET` request to the `/api/rates` endpoint.
+
+The request parameters should contain the following:
+- `source`: The source currency code. This is a required field of type `string`.
+- `target`: The target currency code. This is a required field of type `string`.
+- `datetime`: optional, The date and time for which you want the exchange rate. This is an optional field of type `string` in ISO 8601 format. If not provided, the latest exchange rate will be used.
+
+## Usage - convert currency
+Here is an example of how to convert currency using curl and JavaScript (Axios):
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&datetime=2023-01-01T00:00:00Z' \
+        --header 'Authorization: Bearer Access Token' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/rates', {
+            params: {
+                source: 'USD',
+                target: 'EUR',
+                datetime: '2023-01-01T00:00:00Z'
+            },
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Get Historical Exchange Rates
+To get historical exchange rates for a specific date, you need to send a `GET` request to the `/api/rates` endpoint.
+
+The request parameters should contain the following:
+- `source`: The source currency code. This is a required field of type `string`.
+- `target`: The target currency code. This is a required field of type `string`.
+- `from`: The start date for the historical data. This is a required field of type `string` in ISO 8601 format.
+- `to`: The end date for the historical data. This is a required field of type
+- `interval`: The interval for the historical data. This is an optional field of type `string`. Possible values are `day`, `hour`, `minute`.
+
+## Usage - get historical exchange rates
+Here is an example of how to get historical exchange rates using curl and JavaScript (Axios):
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&from=2023-01-01T00:00:00Z&to=2023-01-07T00:00:00Z&interval=day' \
+        --header 'Authorization: Bearer Access Token' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/rates', {
+            params: {
+                source: 'USD',
+                target: 'EUR',
+                from: '2023-01-01T00:00:00Z',
+                to: '2023-01-07T00:00:00Z',
+                interval: 'day'
+            },
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
