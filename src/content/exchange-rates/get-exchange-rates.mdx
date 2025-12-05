@@ -1,4 +1,4 @@
-import { Tabs } from 'nextra/components';
+import {Callout, Tabs} from 'nextra/components';
 
 # Get Exchange Rates
 
@@ -10,7 +10,25 @@ import { Tabs } from 'nextra/components';
 ## Get latest exchange rates
 To get the latest exchange rates, you need to send a `GET` request to the `/api/rates` endpoint.
 
-The request parameters does not require any parameters.
+The request body should contain the following parameters:
+- `source`: The source currency code. This is a required field of type `string`.
+- `target`: The target currency code. This is a required field of type `string`.
+- `datetime`: optional, The date and time for which you want the exchange rate. This is an optional field of type `string` in ISO 8601 format. If not provided, the latest exchange rate will be used.
+- `from`: optional, The start date for the historical data. This is an optional field of type `string` in ISO 8601 format.
+- `to`: optional, The end date for the historical data. This is an optional field of type `string` in ISO 8601 format.
+- `interval`: optional, The interval for the historical data. This is an optional field of type `string`. Possible values are `day`, `hour`, `minute`.
+
+<Callout type="warning" emoji="⚠️">
+   If datetime was provided, please do not provide from or to or interval parameters.
+    OTHERWISE, the API will return an error.
+</Callout>
+
+<Callout type="warning" emoji="⚠️">
+    If from or to were provided, please also provide interval parameter.
+    And please do not provide datetime parameter.
+    OTHERWISE, the API will return an error.
+</Callout>
+
 
 ## Usage - fetch all latest exchange rates
 Here is an example of how to fetch all latest exchange rates using curl and JavaScript (Axios):
