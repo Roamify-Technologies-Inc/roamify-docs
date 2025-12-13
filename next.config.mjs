@@ -52,9 +52,6 @@ const nextConfig = {
     devIndicators: {
         position: "bottom-right",
     },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     typescript: {
         ignoreBuildErrors: true,
     }
