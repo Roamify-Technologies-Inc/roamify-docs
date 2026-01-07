@@ -1,4 +1,5 @@
 import { Tabs, Callout } from 'nextra/components';
+import Link from 'next/link';
 
 # eSIMs Link API - New way to distribute/share eSIM with your customers
 
@@ -16,6 +17,10 @@ The request body should contain the either the following parameters:
 
 ### Usage - Generate eSIM Link
 Here is an example of how you can generate an eSIM link using `curl` or `javascript`.
+
+- Sample eSIMs Link URL: <Link className="underline" href="https://dev.esims.link/acme/4OYONUH79IW1">eSIMs Link URL</Link>
+- Sample Access Code: `5897`
+- Sample eSIMs Link WhatsApp Message URL: <Link className="underline" href="https://api.whatsapp.com/send?text=Check%20out%20your%20eSIM%3A%20https%3A%2F%2Fdev.esims.link%2Facme%2F4OYONUH79IW1%20with%20access%20code%3A%205897">WhatsApp Message URL</Link>
 
 <Tabs items={['curl', 'javascript']}>
     <Tabs.Tab index={0}>
