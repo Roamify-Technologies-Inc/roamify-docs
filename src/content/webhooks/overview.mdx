@@ -32,6 +32,7 @@ Here is a high level overview of the recommended practices for using Roamify Web
 - **Security**: Keep your webhook endpoint secure by implementing authentication and authorization mechanisms. This can include IP whitelisting, API keys, or other security measures to ensure that only authorized requests are processed.
 
 ### Sample Webhook Flow
+
 Below is a code snippet that demonstrates how to verify the signature of a webhook request in JavaScript:
  <Tabs items={['javascript', 'php', 'python']}>
         <Tabs.Tab index={0}>
@@ -173,3 +174,45 @@ Below is a code snippet that demonstrates how to verify the signature of a webho
         ```
         </Tabs.Tab>
     </Tabs>
+
+### Architecture Diagram
+```mermaid
+graph TD;
+    subgraph Roamify [Roamify Platform]
+        A[Event Occurs]
+        B[Generate Webhook Payload]
+        C[Sign with Secret Key]
+        D[Send HTTPS POST Request]
+    end
+    subgraph YourEndpoint [Your Webhook Endpoint]
+        E[Receive Webhook Request]
+        F{Verify Signature}
+        G[Return 200 OK]
+        H[Return 4xx/5xx Error]
+        I[Queue for Processing]
+    end
+    subgraph Processing [Async Processing]
+        J{Event Category?}
+        K[Process eSIM Events]
+        L[Process Partner Events]
+        M[Process Affiliate Events]
+        N[eSIM Usage/Status]
+        O[Low/Insufficient Balance<br/>Top-up]
+        P[Affiliate Order]
+    end
+    A --> B;
+    B --> C;
+    C --> D;
+    D --> E;
+    E --> F;
+    F -->|Valid| G;
+    F -->|Invalid| H;
+    G --> I;
+    I --> J;
+    J -->|esim| K;
+    J -->|partner| L;
+    J -->|affiliate| M;
+    K --> N;
+    L --> O;
+    M --> P;
+```
