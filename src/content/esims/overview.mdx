@@ -70,7 +70,7 @@ Here is an example of how you can get a list of eSIM packages using Roamify eSIM
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/packages' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -115,7 +115,7 @@ Here is an example of how you can create an eSIM order using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/order' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "items": [
@@ -175,7 +175,7 @@ Here is an example of how you can apply an eSIM profile using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/apply' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "esimId": "eSIM ID"
@@ -220,7 +220,7 @@ Here is an example of how you can get the usage details of an eSIM using Roamify
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/usage?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -264,7 +264,7 @@ Here is an example of how you can get a list of compatible top-ups for an eSIM u
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/topup/packages?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -304,7 +304,7 @@ Here is an example of how you can create a top-up order using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/order/topup' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "iccid": "ICCID",
@@ -350,7 +350,7 @@ Here is an example of how you can get the remaining balance of your funds using 
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/balance' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>

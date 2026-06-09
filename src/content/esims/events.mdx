@@ -12,7 +12,7 @@ This is a super handy feature to get eSIM lifecycle events end-to-end when appli
 ## Get eSIM Events
 To get the list of eSIM events, you need to send a `GET` request to the `/api/esim/events` endpoint.
 
-The request body should contain one of the following parameters:
+The query parameters should contain one of the following parameters:
 - `iccid`: The ICCID of the eSIM.
 - `esimId`: The esimId provided by Roamify.
 - `referenceId`: The referenceId provided by you when creating the order.
@@ -23,9 +23,9 @@ Here is an example of how you can get eSIM events using ICCID
 <Tabs items={['curl', 'javascript']}>
     <Tabs.Tab index={0}>
         ```bash
-        curl --request POST \
-        --url 'https://api-dev.getroamify.com/api/esim/event?iccid={your iccid}' \
-        --header 'Authorization: Bearer Access Token' \
+		curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/esim/events?iccid={your iccid}' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         ```
     </Tabs.Tab>
@@ -33,8 +33,7 @@ Here is an example of how you can get eSIM events using ICCID
         ```javascript
         const axios = require('axios');
 
-        axios.post('https://api-dev.getroamify.com/api/esim/event?iccid={your_iccid}', {
-    }, {
+		axios.get('https://api-dev.getroamify.com/api/esim/events?iccid={your_iccid}', {
         headers: {
         'Authorization': 'Bearer {access token here}',
         'Content-Type': 'application/json'

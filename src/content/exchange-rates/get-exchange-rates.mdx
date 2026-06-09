@@ -38,7 +38,7 @@ Here is an example of how to fetch all latest exchange rates using curl and Java
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/rates' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -78,7 +78,7 @@ Here is an example of how to convert currency using curl and JavaScript (Axios):
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&datetime=2023-01-01T00:00:00Z' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -125,7 +125,7 @@ Here is an example of how to get historical exchange rates using curl and JavaSc
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&from=2023-01-01T00:00:00Z&to=2023-01-07T00:00:00Z&interval=day' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>

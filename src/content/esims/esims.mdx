@@ -43,7 +43,7 @@ Here is an example of how you can apply an eSIM profile using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/apply' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "esimId": "eSIM ID"
@@ -191,7 +191,7 @@ Here is an example of how you can get the usage details of an eSIM using Roamify
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/usage?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -253,7 +253,7 @@ Here is an example of how you can get the usage details of an eSIM using Roamify
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/usage/details?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -327,7 +327,7 @@ Here is an example of how you can get a list of compatible top-ups for an eSIM u
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/topup/packages?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -410,7 +410,7 @@ Here is an example of how you can get a history of eSIM packages applied to an e
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/history?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -467,7 +467,7 @@ Here is an example of how you can get an eSIM using Roamify eSIM API.
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim?iccid=ICCID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -555,7 +555,7 @@ Here is an example of how you can get an eSIM using Roamify eSIM API.
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim?esimId=YOUR eSIMID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -652,7 +652,7 @@ Here is an example of how you can get a list of eSIMs using Roamify eSIM API.
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esims' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>

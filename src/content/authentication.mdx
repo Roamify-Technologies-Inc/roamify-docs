@@ -28,8 +28,8 @@ Here is an example of how you can use your Access Token to make requests to Roam
     <Tabs.Tab index={0}>
         ```bash
         curl --request GET \
-        --url 'https://api-dev.getroamify.com/api/esim/countries?=' \
-        --header 'Authorization: Bearer {access token here}' \
+        --url 'https://api-dev.getroamify.com/api/esim/countries' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         ```
     </Tabs.Tab>

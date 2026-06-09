@@ -26,7 +26,7 @@ Here is an example of how you can create an eSIM order using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/order' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "items": [
@@ -111,7 +111,7 @@ Here is an example of how you can create a top-up order using Roamify eSIM API.
         ```bash
         curl --request POST \
         --url 'https://api-dev.getroamify.com/api/esim/order/topup' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
             "iccid": "ICCID",
@@ -197,8 +197,8 @@ Here is an example of how you can create an instant eSIM order using Roamify eSI
     <Tabs.Tab index={0}>
         ```bash
         curl --request POST \
-        --url 'https://api-dev.getroamify.com/api/esim/order' \
-        --header 'Authorization: Bearer Access Token' \
+        --url 'https://api-dev.getroamify.com/api/esim/order/instant' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json' \
         --data '{
         "items": [
@@ -215,7 +215,7 @@ Here is an example of how you can create an instant eSIM order using Roamify eSI
         ```javascript
         const axios = require('axios');
 
-        axios.post('https://api-dev.getroamify.com/api/esim/order', {
+        axios.post('https://api-dev.getroamify.com/api/esim/order/instant', {
         items: [
     {
         packageId: 'Package ID',
@@ -316,7 +316,7 @@ Here is an example of how you can get a specific eSIM order using Roamify eSIM A
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/order?orderId=Order ID' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
@@ -392,7 +392,7 @@ Here is an example of how you can get a list of eSIM orders using Roamify eSIM A
         ```bash
         curl --request GET \
         --url 'https://api-dev.getroamify.com/api/esim/orders?status=PENDING&limit=10' \
-        --header 'Authorization: Bearer Access Token' \
+        --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
     </Tabs.Tab>
