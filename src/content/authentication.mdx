@@ -1,25 +1,28 @@
-import {  Tabs } from 'nextra/components';
+import { Tabs } from 'nextra/components';
 
-# Auth with Roamify API
+# Authentication
 
-We are using Bearer Token Authentication for Roamify API. This means that you need to include your Access Token in the `Authorization` header of your requests to Roamify API.
+Roamify API uses Bearer token authentication. Send your access token in the `Authorization` header for every authenticated request.
 
 ## Table of Contents
-- [Auth with Roamify API](#auth-with-roamify-api)
+- [Authentication](#authentication)
 - [Authentication Flow](#authentication-flow)
-- [Access Token](#access-token)
-- [Refresh Token](#refresh-token)
+- [Access Token Policy](#access-token-policy)
+- [Token Rotation](#token-rotation)
 - [Usage - how to use your Access Token](#usage---how-to-use-your-access-token)
 
 ## Authentication Flow
 1. **Get Access Token**: Retrieve your Access Token (called API Key in the portal) from [Roamify Partner Portal](https://partner.getroamify.com/sign-in).
-2. **Use Access Token**: Use the Access Token to make requests to Roamify eSIM API by including it in the `Authorization` header as a `Bearer` token.
+2. **Choose environment**:
+    - Development: `https://api-dev.getroamify.com`
+    - Production: `https://api.getroamify.com`
+3. **Use Access Token**: Include the token in the `Authorization` header as `Bearer <token>`.
 
-## Access Token
-Your Access Token is a long-lived token that you can use to make requests to Roamify eSIM API. You never need to refresh it, as it does not expire.
+## Access Token Policy
+Your Access Token is long-lived and does not expire automatically. It remains valid until you rotate it in the Partner Portal.
 
-## Refresh Token
-You can refresh your Access Token in the Roamify Partner Portal, under the `API Keys` section. Upon refreshing your Access Token, your old Access Token will be invalidated.
+## Token Rotation
+You can rotate your Access Token in the Roamify Partner Portal under `API Keys`. After rotation, the old token is immediately invalidated.
 
 ## Usage - how to use your Access Token
 Here is an example of how you can use your Access Token to make requests to Roamify eSIM API.
@@ -37,10 +40,9 @@ Here is an example of how you can use your Access Token to make requests to Roam
         ```javascript
         const axios = require('axios');
 
-        axios.get('https://api-dev.getroamify.com/api/esim/countries?', {
+        axios.get('https://api-dev.getroamify.com/api/esim/countries', {
             headers: {
-                '
-                Authorization: Bearer {access token here}',
+                'Authorization': 'Bearer {access token here}',
                 'Content-Type': 'application/json'
             }
         })
@@ -53,3 +55,15 @@ Here is an example of how you can use your Access Token to make requests to Roam
         ```
     </Tabs.Tab>
 </Tabs>
+
+## Response and Error Handling
+Authentication itself is header-based, so response payloads depend on the endpoint you call.
+
+Common status codes:
+- `200`: Request accepted.
+- `401`: Missing token, malformed `Authorization` header, or invalid/rotated token.
+- `403`: Token is valid but does not have permission for the requested action.
+- `500`: Internal server error. Retry the request with backoff or contact support if the issue persists.
+
+For exact response schema, check each endpoint reference page.
+

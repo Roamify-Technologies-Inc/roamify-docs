@@ -1,7 +1,7 @@
-import {Tabs} from "nextra/components";
+import { Tabs } from 'nextra/components';
 
 # Roamify Webhooks Overview
-Roamify Webhooks provides a way for API users to receive notifications about various events within the platform.
+Roamify Webhooks lets API users receive event notifications from the Roamify platform.
 
 Currently, it supports the following features:
 - **eSIM Usage**: Receive notifications about eSIM data usage at configurable intervals
@@ -13,7 +13,8 @@ Currently, it supports the following features:
 ## Table of Contents
 - [Mandatory Requirements](#mandatory-requirements)
 - [Recommended Practices](#recommended-practices)
-    - [Sample Verification Code](#sample-verification-code)
+- [Sample Webhook Flow](#sample-webhook-flow)
+- [Architecture Diagram](#architecture-diagram)
 
 ## Mandatory Requirements
 To use Roamify Webhooks, you must meet the following requirements:
@@ -33,147 +34,91 @@ Here is a high level overview of the recommended practices for using Roamify Web
 
 ### Sample Webhook Flow
 
-Below is a code snippet that demonstrates how to verify the signature of a webhook request in JavaScript:
- <Tabs items={['javascript', 'php', 'python']}>
-        <Tabs.Tab index={0}>
-            ```javascript
-            const crypto = require('crypto');
-            const secret = 'your_secret' // Replace with your actual secret key
-            const rawBody = req.rawBody; // The raw body of the request
-            const signature = req.headers['x-roamify-signature']; // The signature from the request
+Below are minimal examples that verify the webhook signature and acknowledge the request quickly.
 
-            const computedSignature = crypto
-            .createHmac('sha256', secret)
-            .update(rawBody, 'utf8')
-            .digest('hex');
+<Tabs items={['javascript', 'php', 'python']}>
+    <Tabs.Tab index={0}>
+        ```javascript
+        const crypto = require('crypto');
 
-            if (computedSignature !== signature) {
-                throw new Error('Invalid signature');
-            }
+        function verifySignature(rawBody, signature, secret) {
+          const computed = crypto.createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');
+          return signature.length === computed.length && crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(signature));
+        }
 
-            // process the webhook data here
-            if(event_category === 'esim') {
-                if(event_type === 'esim_usage') {
-                    // handle esim usage event
-                } else if(event_type === 'esim_status') {
-                    // handle esim status event
-                }
-            } else if(event_category === 'partner') {
-                if(event_type === 'low_balance') {
-                    // handle partner balance event
-                } else if(event_type === 'insufficient_balance') {
-                    // handle insufficient balance event
-                } else if(event_type === 'top_up') {
-                    // handle top up event
-                }
-            } else if(event_category === 'affiliate') {
-                if(event_type === 'order') {
-                    // handle affiliate order event
-                } else {
-                    throw new Error('Unknown event type for affiliate');
-                }
-            } else {
-                throw new Error('Unknown event category');
-            }
+        // Example Express handler
+        app.post('/webhooks/roamify', (req, res) => {
+          const secret = process.env.ROAMIFY_WEBHOOK_SECRET;
+          const signature = req.header('x-roamify-signature') || '';
+          const rawBody = req.rawBody || JSON.stringify(req.body);
 
-            return res.status(200).send({
-                code: 200,
-                message: 'success'
-            });
+          if (!verifySignature(rawBody, signature, secret)) {
+            return res.status(401).json({ code: 401, message: 'invalid signature' });
+          }
+
+          const { event_category, event_type } = req.body;
+
+          // Queue your async processing here
+          // queueWebhook({ event_category, event_type, payload: req.body });
+
+          return res.status(200).json({ code: 200, message: 'success' });
         });
-            ```
-        </Tabs.Tab>
-        <Tabs.Tab index={1}>
-            ```php
-            $secret = 'your_secret'; // Replace with your actual secret key
-            $rawBody = file_get_contents('php://input'); // The raw body of the request
-            $signature = $_SERVER['HTTP_X_ROAMIFY_SIGNATURE']; // The signature from the request
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```php
+        <?php
+        $secret = getenv('ROAMIFY_WEBHOOK_SECRET');
+        $rawBody = file_get_contents('php://input');
+        $signature = $_SERVER['HTTP_X_ROAMIFY_SIGNATURE'] ?? '';
 
-            $computedSignature = hash_hmac('sha256', $rawBody, $secret);
+        $computed = hash_hmac('sha256', $rawBody, $secret);
 
-            if ($computedSignature !== $signature) {
-            throw new Exception('Invalid signature');
-            }
+        if (!hash_equals($computed, $signature)) {
+            http_response_code(401);
+            echo json_encode(['code' => 401, 'message' => 'invalid signature']);
+            exit;
+        }
 
-            // process the webhook data here
-            if($event_category === 'esim') {
-                if($event_type === 'esim_usage') {
-                    // handle esim usage event
-                } else if($event_type === 'esim_status') {
-                    // handle esim status event
-                }
-            } else if($event_category === 'partner') {
-                if($event_type === 'low_balance') {
-                    // handle partner balance event
-                } else if($event_type === 'insufficient_balance') {
-                    // handle insufficient balance event
-                } else if($event_type === 'top_up') {
-                    // handle top up event
-                }
-            } else if($event_category === 'affiliate') {
-                if($event_type === 'order') {
-                    // handle affiliate order event
-                } else {
-                    throw new Exception('Unknown event type for affiliate');
-                }
-            } else {
-                throw new Exception('Unknown event category');
-            }
+        $payload = json_decode($rawBody, true);
+        $eventCategory = $payload['event_category'] ?? null;
+        $eventType = $payload['event_type'] ?? null;
 
-            return response()->json([
-                'code' => 200,
-                'message' => 'success'
-            ]);
-            ```
-        </Tabs.Tab>
+        // Queue your async processing here
+
+        http_response_code(200);
+        echo json_encode(['code' => 200, 'message' => 'success']);
+        ```
+    </Tabs.Tab>
     <Tabs.Tab index={2}>
         ```python
-        import hmac
         import hashlib
-        import base64
-        from flask import request
+        import hmac
+        import os
+        from flask import request, jsonify
 
-        secret = 'your_secret'  # Replace with your actual secret key
-        raw_body = request.get_data(as_text=True)  # The raw body of the request
-        signature = request.headers.get('X-Roamify-Signature')  # The signature from the request
+        def verify_signature(raw_body: str, signature: str, secret: str) -> bool:
+            computed = hmac.new(secret.encode('utf-8'), raw_body.encode('utf-8'), hashlib.sha256).hexdigest()
+            return hmac.compare_digest(computed, signature)
 
-        computed_signature = hmac.new(
-            secret.encode('utf-8'),
-            raw_body.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
+        def roamify_webhook_handler():
+            secret = os.environ['ROAMIFY_WEBHOOK_SECRET']
+            raw_body = request.get_data(as_text=True)
+            signature = request.headers.get('X-Roamify-Signature', '')
 
-        if computed_signature != signature:
-            raise Exception('Invalid signature')
+            if not verify_signature(raw_body, signature, secret):
+                return jsonify({'code': 401, 'message': 'invalid signature'}), 401
 
-        # process the webhook data here
-        if event_category == 'esim':
-            if event_type == 'esim_usage':
-                # handle esim usage event
-            elif event_type == 'esim_status':
-                # handle esim status event
-        elif event_category == 'partner':
-            if event_type == 'low_balance':
-                # handle partner balance event
-            elif event_type == 'insufficient_balance':
-                # handle insufficient balance event
-            elif event_type == 'top_up':
-                # handle top up event
-        elif event_category == 'affiliate':
-            if event_type == 'order':
-                # handle affiliate order event
-            else:
-                raise Exception('Unknown event type for affiliate')
-        else:
-            raise Exception('Unknown event category')
+            payload = request.get_json(silent=True) or {}
+            event_category = payload.get('event_category')
+            event_type = payload.get('event_type')
 
-        return {
-            'code': 200,
-            'message': 'success'
-        }
+            # Queue your async processing here
+
+            return jsonify({'code': 200, 'message': 'success'}), 200
         ```
-        </Tabs.Tab>
-    </Tabs>
+    </Tabs.Tab>
+</Tabs>
 
 ### Architecture Diagram
 ```mermaid

@@ -1,9 +1,9 @@
-import { Tabs } from 'nextra/components';
+import { Callout, Tabs } from 'nextra/components';
 
 # eSIM API Overview
 
 ## Table of Contents
-- [eSIM Overview](#eSIM-Overview)
+- [Roamify eSIM Overview](#roamify-esim-overview)
 - [Recommended steps to use eSIM API](#recommended-steps-to-use-esim-api)
 
 ## Roamify eSIM Overview
@@ -21,6 +21,14 @@ Roamify eSIM API consists of the following services:
 You can use these services to buy eSIMs, check your balance, and more.
 
 ## Recommended steps to use eSIM API
+
+Before implementing each step, review the endpoint-specific reference page for request and response schema details:
+- [Countries](/esims/countries)
+- [Packages](/esims/packages)
+- [Orders](/esims/orders)
+- [eSIMs](/esims/esims)
+- [Events](/esims/events)
+- [Balance](/esims/balance)
 
 ### Step 0: Flow Diagram
 ```mermaid
@@ -104,9 +112,7 @@ The request body should contain the following parameters:
   - `packageId`: The ID of the eSIM package. This is a required field of type `string`.
   - `quantity`: The quantity of the eSIMs you want to order. This is a required field of type `number`.
 
-OR
-
-Alternatively, you can send a `POST` request to the `/api/esim/order` endpoint with the id your provided as 'referenceId' in the request body.
+Alternatively, you can send a `POST` request to the `/api/esim/order` endpoint using a previously provided `referenceId` in the request body.
 
 #### Usage - how to create an eSIM order
 Here is an example of how you can create an eSIM order using Roamify eSIM API.
@@ -163,9 +169,15 @@ Alternatively, you can also use the `referenceId` you provided in the request bo
 
 To generate an eSIM, you need to send a `POST` request to the `/api/esim/apply` endpoint with the required body parameters.
 
+<Callout type="warning" emoji="⚠️">
+    `startDate` is required for packages where `requirements.travelDate` is `true`. Use ISO 8601 format (for example, `2026-07-01`).
+    For full endpoint details, see [Generate eSIM Profile](https://roamify.apidog.io/generate-esim-profile-12947632e0).
+</Callout>
+
 The request body should contain the following parameters:
 - `esimId`: The ID of the eSIM. This is a required field of type `string`.
-- `referenceId`: The reference ID you provided when creating the order. This is an optional field of type `string`. (Your custom reference ID for the order, if needed.))
+- `referenceId`: The reference ID you provided when creating the order. This is an optional field of type `string`.
+- `startDate`: Travel start date in ISO 8601 format. This is a conditional field required only when `requirements.travelDate` is `true`.
 
 #### Usage - how to generate an eSIM profile
 Here is an example of how you can apply an eSIM profile using Roamify eSIM API.
@@ -248,6 +260,8 @@ You can read more about this endpoint [here](/esims/esims).
 
 ### Step 6: Get compatible top-up packages for an eSIM
 Before you can top-up an eSIM, you need to know which packages are compatible with the eSIM you want to top-up. To get the compatible top-up packages for an eSIM, you need to send a `GET` request to the `/api/esim/topup/packages` endpoint with the required parameters.
+
+For an end-to-end walkthrough (with decision points and diagram), see [Top-up Flow](/esims/topup-flow).
 
 The parameters required for this endpoint are:
 - `iccid`: The ICCID of the eSIM. This is a required field of type `string`.
