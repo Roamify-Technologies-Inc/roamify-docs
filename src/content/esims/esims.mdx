@@ -27,6 +27,10 @@ To apply an eSIM profile, you need to send a `POST` request to the `/api/esim/ap
 <Callout type="warning" emoji="⚠️">
     Due to server load, the eSIM profile generation can take up to 90 seconds. Please make sure the timeout of your request is set to at least 90 seconds.
 </Callout>
+<Callout type="warning" emoji="⚠️">
+    `startDate` is required for packages where `requirements.travelDate` is `true`. Use ISO 8601 format (for example, `2026-07-01`).
+    For full endpoint details, see [Generate eSIM Profile](https://roamify.apidog.io/generate-esim-profile-12947632e0).
+</Callout>
 <Callout type="error" emoji="🚫" className="my-4">
     If your request times out or failed with a error message stating: "eSIM is still pending processing",
     please send a follow up request to /esim?esimId=YOUR_ESIM_ID to retrieve the eSIM.
@@ -35,6 +39,7 @@ To apply an eSIM profile, you need to send a `POST` request to the `/api/esim/ap
 The request body should contain the following parameters:
 - `esimId`: The ID of the eSIM. This is a required field of type `string`.
 - `referenceId`: The reference ID of the eSIM order. This is an optional field of type `string`. If you do not provide a reference ID, the API will generate a single eSIM profile for the provided `esimId`.
+- `startDate`: Travel start date in ISO 8601 format. This is a conditional field required only when `requirements.travelDate` is `true`.
 
 ### Usage - generate eSIM profile
 Here is an example of how you can apply an eSIM profile using Roamify eSIM API.

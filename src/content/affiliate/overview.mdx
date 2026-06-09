@@ -4,7 +4,7 @@ import Image from "next/image";
 # Affiliate API Overview
 
 ## Table of Contents
-- [Affiliate Overview](#Affiliate-Overview)
+- [Affiliate Overview](#affiliate-overview)
 - [Recommended steps to use Affiliate API](#recommended-steps-to-use-affiliate-api)
 
 ## Affiliate Overview
@@ -15,7 +15,7 @@ You only need to follow a few steps to integrate Roamify Affiliate API into your
     Customer must click your referral link to be able to track the sale and reward you with the commission regardless of promo code used.
 </Callout>
 - <strong>Step 1: Authentication</strong>: You need to have your Access Token to make requests to Roamify eSIM API. You can get your Access Token from [Roamify Partner Portal](https://partner.getroamify.com/sign-in).
-- <strong>Step 2: Get eSIM Packages</strong>: You will be assigned a dedicated endpoint to get a list of eSIM packages, which included all available eSIM packages and your referral link for each package.
+- <strong>Step 2: Get eSIM Packages</strong>: You will be assigned a dedicated endpoint to get a list of eSIM packages, which includes all available eSIM packages and your referral link for each package.
 - <strong>Step 3: Present to Customers</strong>: You can present the eSIM packages to your customers using the referral link you received in the previous step.
 - <strong>Step 4: Track rewards</strong>: You can track your rewards in the Roamify Partner Portal. You will see how many sales you made, how much commission you earned, and more.
 
@@ -31,7 +31,7 @@ Our token is a Bearer token, which means you need to include it in the `Authoriz
 ### Step 2: Get eSIM Packages
 With your dedicated endpoint, you can get a list of eSIM packages that are available for you to promote.
 
-You need to send a `GET` request to the `/api/esim/{unique name}/packages` endpoint.
+You need to send a `GET` request to the `/api/esim/{partnerSlug}/packages` endpoint.
 
 This endpoint will return a list of all available eSIM packages with referral links for each package.
 
@@ -52,7 +52,7 @@ Here is an example of how you can get a list of eSIM packages using Roamify eSIM
         ```javascript
         const axios = require('axios');
 
-        axios.get('https://api-dev.getroamify.com/api/esim/packages', {
+        axios.get('https://api-dev.getroamify.com/api/esim/esimradar/packages', {
             headers: {
                 'Authorization': 'Bearer {access token here}',
                 'Content-Type': 'application/json'

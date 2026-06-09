@@ -3,6 +3,7 @@ export default {
     "countries": "Countries",
     "packages": "Packages",
     "orders": "Orders",
+    "topup-flow": "Top-up Flow",
     "esims": "eSIMs",
     "esims-link": "eSIM Link",
     "events": "eSIM Events",
