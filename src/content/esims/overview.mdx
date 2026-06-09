@@ -69,7 +69,13 @@ Our token is a Bearer token, which means you need to include it in the `Authoriz
 ### Step 2: Get eSIM Packages
 To get a list of eSIM packages, you need to send a `GET` request to the `/api/esim/packages` endpoint. 
 
-This endpoint will return a list of all available eSIM packages. You can also filter the packages by country, geography, days, gbs and isUnlimited parameters.
+This endpoint now returns paginated results. Use `page` and `pageSize` query parameters and iterate through pages when you need the full catalog.
+
+Before filtering by country, fetch `GET /api/esim/countries` and use only these values:
+- `country`: use the returned `name`
+- `countryCode`: use the returned `code`
+
+You can also filter packages by `geography`, `days`, `gbs`, and `isUnlimited`.
 
 #### Usage - how to get eSIM packages
 Here is an example of how you can get a list of eSIM packages using Roamify eSIM API.
@@ -77,7 +83,7 @@ Here is an example of how you can get a list of eSIM packages using Roamify eSIM
     <Tabs.Tab index={0}>
         ```bash
         curl --request GET \
-        --url 'https://api-dev.getroamify.com/api/esim/packages' \
+        --url 'https://api-dev.getroamify.com/api/esim/packages?page=1&pageSize=50' \
         --header 'Authorization: Bearer {{token}}' \
         --header 'Content-Type: application/json'
         ```
@@ -86,7 +92,7 @@ Here is an example of how you can get a list of eSIM packages using Roamify eSIM
         ```javascript
         const axios = require('axios');
 
-        axios.get('https://api-dev.getroamify.com/api/esim/packages', {
+        axios.get('https://api-dev.getroamify.com/api/esim/packages?page=1&pageSize=50', {
             headers: {
                 'Authorization': 'Bearer {access token here}',
                 'Content-Type': 'application/json'
