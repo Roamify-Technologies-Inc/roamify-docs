@@ -21,9 +21,10 @@ All requests require the `Authorization: Bearer {token}` header and `Content-Typ
 - [eSIM Countries](https://docs.getroamify.com/esims/countries/): GET /api/esim/countries — list 200+ countries with eSIM coverage; global eSIM support for travel, international roaming, and local eSIM data plans
 - [eSIM Packages](https://docs.getroamify.com/esims/packages/): GET /api/esim/packages — browse local eSIM plans, regional eSIM plans, and global eSIM data packages; filter by country, geography, days, GBs, unlimited eSIM, or packageId
 - [eSIM Orders](https://docs.getroamify.com/esims/orders/): POST /api/esim/order — place eSIM wholesale orders, create eSIM top-up orders, instant eSIM orders, and retrieve order history for eSIM resellers
-- [eSIM Management](https://docs.getroamify.com/esims/esims/): POST /api/esim/apply — generate and activate eSIM profiles; get eSIM data usage, compatible top-up packages, eSIM package history, and retrieve eSIM by ICCID or esimId
+- [eSIM Management](https://docs.getroamify.com/esims/esims/): POST /api/esim/apply — generate and activate eSIM profiles; get eSIM data usage, compatible top-up packages, eSIM package history, retrieve eSIM by ICCID or esimId, and send SMS messages to eSIM profiles
+- [Send SMS to eSIM](https://docs.getroamify.com/esims/esims/): POST /api/esim/sms — send an SMS to a specific eSIM using ICCID and message body
 - [eSIM Sharing Link](https://docs.getroamify.com/esims/esims-link/): POST /api/esim/link — generate branded eSIM installation links for customers; includes access code and pre-built WhatsApp share URL for eSIM distribution
-- [eSIM Lifecycle Events](https://docs.getroamify.com/esims/events/): GET /api/esim/events — retrieve complete eSIM lifecycle history (activation, usage, expiry) by ICCID, esimId, or custom referenceId; useful for eSIM support teams
+- [eSIM Lifecycle Events](https://docs.getroamify.com/esims/events/): GET /api/esim/event — retrieve complete eSIM lifecycle history (activation, usage, expiry) by ICCID, esimId, or custom referenceId; useful for eSIM support teams
 - [eSIM Compatible Devices](https://docs.getroamify.com/esims/compatible-devices/): GET /api/compatible-devices — list all eSIM-compatible smartphones, tablets, and wearables to help customers check eSIM device compatibility
 - [Partner Account Balance](https://docs.getroamify.com/esims/balance/): GET /api/balance — retrieve real-time prepaid wallet balance for eSIM wholesale and eSIM reseller accounts
 

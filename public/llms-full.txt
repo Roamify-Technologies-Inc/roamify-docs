@@ -107,7 +107,8 @@ The Roamify eSIM API is the most comprehensive eSIM API for travel apps, eSIM re
 - Packages — GET /api/esim/packages (local, regional & global eSIM data plans)
 - Orders — POST/GET /api/esim/order (eSIM wholesale orders & top-ups)
 - eSIMs — POST /api/esim/apply (instant eSIM profile generation & activation)
-- eSIM Events — GET /api/esim/events (full eSIM lifecycle history)
+- eSIM SMS — POST /api/esim/sms (send SMS messages to customer eSIM profiles)
+- eSIM Events — GET /api/esim/event (full eSIM lifecycle history)
 - eSIM Link — POST /api/esim/link (branded eSIM installation share links)
 - Compatible Devices — GET /api/compatible-devices (eSIM device compatibility check)
 - Balance — GET /api/balance (eSIM reseller prepaid wallet balance)
@@ -261,7 +262,7 @@ curl --request POST \
 `GET /api/esim/usage/details?esimId=ESIM_ID`
 
 ### Get eSIM Compatible Top-ups
-`GET /api/esim/topups?iccid=ICCID`
+`GET /api/esim/topup/packages?iccid=ICCID`
 
 ### Get eSIM Packages History
 `GET /api/esim/history?esimId=ESIM_ID`
@@ -274,6 +275,24 @@ curl --request POST \
 
 ### Get eSIMs List
 `GET /api/esims`
+
+### Send SMS to eSIM
+`POST /api/esim/sms`
+
+Body:
+- `iccid` (string, required) — ICCID of the target eSIM
+- `message` (string, required) — SMS message content
+
+```bash
+curl --request POST \
+  --url 'https://api-dev.getroamify.com/api/esim/sms' \
+  --header 'Authorization: Bearer {{token}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "iccid": "871003213213123131",
+    "message": "Hello Customer!"
+  }'
+```
 
 ---
 
@@ -308,7 +327,7 @@ Response includes:
 
 Source: https://docs.getroamify.com/esims/events/
 
-Endpoint: `GET /api/esim/events`
+Endpoint: `GET /api/esim/event`
 
 Retrieve the complete lifecycle event history of an eSIM — from order placement and profile activation to data usage milestones and expiry. Essential for eSIM reseller support teams diagnosing customer issues and for building eSIM lifecycle dashboards.
 
@@ -319,7 +338,7 @@ Query parameters (provide one):
 
 ```bash
 curl --request GET \
-  --url 'https://api-dev.getroamify.com/api/esim/events?iccid=ICCID' \
+  --url 'https://api-dev.getroamify.com/api/esim/event?iccid=ICCID' \
   --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
