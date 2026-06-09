@@ -1,6 +1,6 @@
 # Roamify eSIM API — Best eSIM API for Resellers, Travel Apps & White-Label eSIM Platforms | Full Documentation
 
-> Roamify offers the best eSIM API for travel tech companies, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, eSIM gift card issuance, affiliate commission tracking, live currency exchange rates, and event-driven webhook notifications. Built for developers who need a reliable, scalable global eSIM API.
+> Roamify offers the best eSIM API for travel tech companies, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, affiliate commission tracking, live currency exchange rates, and event-driven webhook notifications. Built for developers who need a reliable, scalable global eSIM API.
 
 Environments:
 - Development: https://api-dev.getroamify.com
@@ -21,7 +21,6 @@ Roamify API is a RESTful eSIM API built for travel apps, eSIM resellers, MVNO pl
 Supported modules:
 - Authentication — secure eSIM API access with long-lived Bearer tokens
 - eSIMs — global eSIM provisioning, activation, top-up, and lifecycle management
-- Gift Cards — eSIM gift card issuance and management
 - Exchange Rates — real-time and historical currency conversion for 100+ currencies
 - Webhooks — real-time eSIM event notifications (status, usage, balance, affiliate orders)
 - Affiliate — eSIM referral and affiliate commission tracking
@@ -56,7 +55,7 @@ Long-lived eSIM API key that does not expire. Only invalidated when manually ref
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/countries' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -108,7 +107,8 @@ The Roamify eSIM API is the most comprehensive eSIM API for travel apps, eSIM re
 - Packages — GET /api/esim/packages (local, regional & global eSIM data plans)
 - Orders — POST/GET /api/esim/order (eSIM wholesale orders & top-ups)
 - eSIMs — POST /api/esim/apply (instant eSIM profile generation & activation)
-- eSIM Events — GET /api/esim/events (full eSIM lifecycle history)
+- eSIM SMS — POST /api/esim/sms (send SMS messages to customer eSIM profiles)
+- eSIM Events — GET /api/esim/event (full eSIM lifecycle history)
 - eSIM Link — POST /api/esim/link (branded eSIM installation share links)
 - Compatible Devices — GET /api/compatible-devices (eSIM device compatibility check)
 - Balance — GET /api/balance (eSIM reseller prepaid wallet balance)
@@ -120,8 +120,8 @@ The Roamify eSIM API is the most comprehensive eSIM API for travel apps, eSIM re
 3. POST /api/esim/order — place eSIM wholesale order (`items[{packageId, quantity}]`, optional `referenceId`)
 4. POST /api/esim/apply — instantly generate and activate eSIM profile (`esimId` or `referenceId`)
 5. GET /api/esim?esimId=... — retrieve real-time eSIM data usage
-6. GET /api/esim/packages?compatible=... — find compatible eSIM top-up packages
-7. POST /api/esim/order — submit eSIM top-up order to extend data
+6. GET /api/esim/topup/packages?iccid=... — find compatible eSIM top-up packages
+7. POST /api/esim/order/topup — submit eSIM top-up order to extend data
 8. GET /api/balance — check eSIM reseller prepaid wallet balance
 
 ---
@@ -137,7 +137,7 @@ Retrieve the complete list of countries where Roamify eSIM data plans are availa
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/countries' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -180,13 +180,13 @@ Notes:
 # All packages
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/packages' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 
 # Filter by country
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/packages?country=US' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -209,7 +209,7 @@ Required body:
 ```bash
 curl --request POST \
   --url 'https://api-dev.getroamify.com/api/esim/order' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json' \
   --data '{
     "items": [{ "packageId": "PACKAGE_ID", "quantity": 1 }],
@@ -250,7 +250,7 @@ Note: eSIM profile generation can take up to 90 seconds. Set request timeout ≥
 ```bash
 curl --request POST \
   --url 'https://api-dev.getroamify.com/api/esim/apply' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json' \
   --data '{ "esimId": "ESIM_ID" }'
 ```
@@ -262,7 +262,7 @@ curl --request POST \
 `GET /api/esim/usage/details?esimId=ESIM_ID`
 
 ### Get eSIM Compatible Top-ups
-`GET /api/esim/topups?iccid=ICCID`
+`GET /api/esim/topup/packages?iccid=ICCID`
 
 ### Get eSIM Packages History
 `GET /api/esim/history?esimId=ESIM_ID`
@@ -275,6 +275,24 @@ curl --request POST \
 
 ### Get eSIMs List
 `GET /api/esims`
+
+### Send SMS to eSIM
+`POST /api/esim/sms`
+
+Body:
+- `iccid` (string, required) — ICCID of the target eSIM
+- `message` (string, required) — SMS message content
+
+```bash
+curl --request POST \
+  --url 'https://api-dev.getroamify.com/api/esim/sms' \
+  --header 'Authorization: Bearer {{token}}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "iccid": "871003213213123131",
+    "message": "Hello Customer!"
+  }'
+```
 
 ---
 
@@ -293,7 +311,7 @@ Body (provide one):
 ```bash
 curl --request POST \
   --url 'https://api-dev.getroamify.com/api/esim/link' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json' \
   --data '{ "iccid": "ICCID_HERE" }'
 ```
@@ -309,7 +327,7 @@ Response includes:
 
 Source: https://docs.getroamify.com/esims/events/
 
-Endpoint: `GET /api/esim/events`
+Endpoint: `GET /api/esim/event`
 
 Retrieve the complete lifecycle event history of an eSIM — from order placement and profile activation to data usage milestones and expiry. Essential for eSIM reseller support teams diagnosing customer issues and for building eSIM lifecycle dashboards.
 
@@ -321,7 +339,7 @@ Query parameters (provide one):
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/event?iccid=ICCID' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -348,7 +366,7 @@ Retrieve the full list of eSIM-compatible smartphones, tablets, wearables, and m
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/compatible-devices' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -365,86 +383,9 @@ Retrieve the real-time prepaid wallet balance for your eSIM reseller or wholesal
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/balance' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
-
----
-
-## eSIM Gift Cards Overview — Issue Travel eSIM Gift Cards Programmatically
-
-Source: https://docs.getroamify.com/gift-cards/overview/
-
-Roamify eSIM gift card API lets you issue, manage, and revoke travel eSIM gift cards for your customers. Ideal for gifting eSIM data plans, corporate travel gifting, and eSIM voucher programs. Works with the Roamify app. Supported operations:
-- Create eSIM Gift Card — issue gift cards for any amount in 30+ currencies
-- Get Gift Card — retrieve gift card details and redemption status
-- Revoke Gift Card — cancel unredeemed gift cards
-- Update Gift Card — update gift card sender details
-
----
-
-## Create eSIM Gift Card — Issue Travel eSIM Gift Cards via API
-
-Source: https://docs.getroamify.com/gift-cards/create-gift-card/
-
-Endpoint: `POST /api/gifts/gift`
-
-Create a travel eSIM gift card for a customer. Supports 30+ currencies for global eSIM gifting.
-
-Required body:
-- `orderId` (string) — your reference order ID
-- `senderEmail` (string) — email of the gift card sender
-- `amount` (number) — gift card value
-- `currency` (string) — ISO 4217 currency code
-
-Optional body:
-- `sender` (string) — sender display name
-
-Supported currencies: USD, CAD, EUR, GBP, AUD, CNY, HKD, JPY, SGD, TWD, KRW, AED, MXN, SAR, EGP, RUB, QAR, INR, THB, BGN, BRL, CHF, CZK, DKK, HUF, MYR, NOK, NZD, PLN, RON, SEK
-
-```bash
-curl --request POST \
-  --url 'https://api-dev.getroamify.com/api/gifts/gift' \
-  --header 'Authorization: Bearer {access_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "orderId": "YOUR_ORDER_ID",
-    "senderEmail": "sender@example.com",
-    "sender": "John Doe",
-    "amount": 50,
-    "currency": "USD"
-  }'
-```
-
----
-
-## Update Gift Card
-
-Source: https://docs.getroamify.com/gift-cards/update-gift-card/
-
-Endpoint: `PATCH /api/gifts/gift`
-
-Update the details of an existing gift card.
-
----
-
-## Revoke Gift Card
-
-Source: https://docs.getroamify.com/gift-cards/revoke-gift-card/
-
-Endpoint: `DELETE /api/gifts/gift`
-
-Revoke/cancel an existing gift card.
-
----
-
-## Get Gift Card(s)
-
-Source: https://docs.getroamify.com/gift-cards/get-gift-card/
-
-Endpoint: `GET /api/gifts/gift`
-
-Retrieve details of one or more gift cards.
 
 ---
 
@@ -630,7 +571,7 @@ Fetch your full eSIM package catalog with your unique affiliate referral link pr
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/esim/esimradar/packages' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -662,7 +603,7 @@ Retrieve the complete list of 100+ fiat currencies supported by the Roamify Exch
 ```bash
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/currencies' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
 
@@ -688,18 +629,18 @@ Parameters:
 # Latest rate
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 
 # Historical rate at a specific datetime
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&datetime=2024-01-15T12:00:00Z' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 
 # Time-series data
 curl --request GET \
   --url 'https://api-dev.getroamify.com/api/rates?source=USD&target=EUR&from=2024-01-01T00:00:00Z&to=2024-01-07T00:00:00Z&interval=day' \
-  --header 'Authorization: Bearer {access_token}' \
+  --header 'Authorization: Bearer {{token}}' \
   --header 'Content-Type: application/json'
 ```
