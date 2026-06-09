@@ -1,6 +1,6 @@
 # Roamify eSIM API — Best eSIM API for Resellers, Travel Apps & White-Label eSIM Platforms
 
-> Roamify offers the best eSIM API for travel apps, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries with a simple REST API. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, affiliate commission tracking, eSIM gift card issuance, live exchange rates, and event-driven webhook notifications. Trusted by global eSIM resellers and travel tech companies. Authentication uses long-lived Bearer tokens from the Roamify Partner Portal.
+> Roamify offers the best eSIM API for travel apps, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries with a simple REST API. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, affiliate commission tracking, live exchange rates, and event-driven webhook notifications. Trusted by global eSIM resellers and travel tech companies. Authentication uses long-lived Bearer tokens from the Roamify Partner Portal.
 
 Environments:
 - Development: https://api-dev.getroamify.com
@@ -26,14 +26,6 @@ All requests require the `Authorization: Bearer {token}` header and `Content-Typ
 - [eSIM Lifecycle Events](https://docs.getroamify.com/esims/events/): GET /api/esim/events — retrieve complete eSIM lifecycle history (activation, usage, expiry) by ICCID, esimId, or custom referenceId; useful for eSIM support teams
 - [eSIM Compatible Devices](https://docs.getroamify.com/esims/compatible-devices/): GET /api/compatible-devices — list all eSIM-compatible smartphones, tablets, and wearables to help customers check eSIM device compatibility
 - [Partner Account Balance](https://docs.getroamify.com/esims/balance/): GET /api/balance — retrieve real-time prepaid wallet balance for eSIM wholesale and eSIM reseller accounts
-
-## Gift Cards Module — eSIM Gift Card API
-
-- [eSIM Gift Cards Overview](https://docs.getroamify.com/gift-cards/overview/): Roamify eSIM gift card API — issue, manage, and revoke eSIM gift cards; ideal for gifting travel data plans and eSIM top-up vouchers (Roamify app)
-- [Create eSIM Gift Card](https://docs.getroamify.com/gift-cards/create-gift-card/): POST /api/gifts/gift — programmatically create eSIM gift cards with custom amounts; supports 30+ currencies (USD, EUR, GBP, AED, JPY, and more)
-- [Update Gift Card](https://docs.getroamify.com/gift-cards/update-gift-card/): PATCH /api/gifts/gift — update sender name or other details on an existing eSIM gift card
-- [Revoke Gift Card](https://docs.getroamify.com/gift-cards/revoke-gift-card/): DELETE /api/gifts/gift — revoke or cancel an issued eSIM gift card before redemption
-- [Get Gift Card(s)](https://docs.getroamify.com/gift-cards/get-gift-card/): GET /api/gifts/gift — retrieve eSIM gift card details and redemption status by order ID
 
 ## Webhooks Module — Real-Time eSIM Event Notifications
 

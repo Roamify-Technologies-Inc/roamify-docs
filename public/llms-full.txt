@@ -1,6 +1,6 @@
 # Roamify eSIM API — Best eSIM API for Resellers, Travel Apps & White-Label eSIM Platforms | Full Documentation
 
-> Roamify offers the best eSIM API for travel tech companies, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, eSIM gift card issuance, affiliate commission tracking, live currency exchange rates, and event-driven webhook notifications. Built for developers who need a reliable, scalable global eSIM API.
+> Roamify offers the best eSIM API for travel tech companies, eSIM resellers, B2B platforms, MVNOs, and white-label eSIM solutions. Instantly provision, activate, and manage eSIMs across 200+ countries. Supports eSIM wholesale purchasing, real-time eSIM activation, data top-ups, affiliate commission tracking, live currency exchange rates, and event-driven webhook notifications. Built for developers who need a reliable, scalable global eSIM API.
 
 Environments:
 - Development: https://api-dev.getroamify.com
@@ -21,7 +21,6 @@ Roamify API is a RESTful eSIM API built for travel apps, eSIM resellers, MVNO pl
 Supported modules:
 - Authentication — secure eSIM API access with long-lived Bearer tokens
 - eSIMs — global eSIM provisioning, activation, top-up, and lifecycle management
-- Gift Cards — eSIM gift card issuance and management
 - Exchange Rates — real-time and historical currency conversion for 100+ currencies
 - Webhooks — real-time eSIM event notifications (status, usage, balance, affiliate orders)
 - Affiliate — eSIM referral and affiliate commission tracking
@@ -368,83 +367,6 @@ curl --request GET \
   --header 'Authorization: Bearer {access_token}' \
   --header 'Content-Type: application/json'
 ```
-
----
-
-## eSIM Gift Cards Overview — Issue Travel eSIM Gift Cards Programmatically
-
-Source: https://docs.getroamify.com/gift-cards/overview/
-
-Roamify eSIM gift card API lets you issue, manage, and revoke travel eSIM gift cards for your customers. Ideal for gifting eSIM data plans, corporate travel gifting, and eSIM voucher programs. Works with the Roamify app. Supported operations:
-- Create eSIM Gift Card — issue gift cards for any amount in 30+ currencies
-- Get Gift Card — retrieve gift card details and redemption status
-- Revoke Gift Card — cancel unredeemed gift cards
-- Update Gift Card — update gift card sender details
-
----
-
-## Create eSIM Gift Card — Issue Travel eSIM Gift Cards via API
-
-Source: https://docs.getroamify.com/gift-cards/create-gift-card/
-
-Endpoint: `POST /api/gifts/gift`
-
-Create a travel eSIM gift card for a customer. Supports 30+ currencies for global eSIM gifting.
-
-Required body:
-- `orderId` (string) — your reference order ID
-- `senderEmail` (string) — email of the gift card sender
-- `amount` (number) — gift card value
-- `currency` (string) — ISO 4217 currency code
-
-Optional body:
-- `sender` (string) — sender display name
-
-Supported currencies: USD, CAD, EUR, GBP, AUD, CNY, HKD, JPY, SGD, TWD, KRW, AED, MXN, SAR, EGP, RUB, QAR, INR, THB, BGN, BRL, CHF, CZK, DKK, HUF, MYR, NOK, NZD, PLN, RON, SEK
-
-```bash
-curl --request POST \
-  --url 'https://api-dev.getroamify.com/api/gifts/gift' \
-  --header 'Authorization: Bearer {access_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "orderId": "YOUR_ORDER_ID",
-    "senderEmail": "sender@example.com",
-    "sender": "John Doe",
-    "amount": 50,
-    "currency": "USD"
-  }'
-```
-
----
-
-## Update Gift Card
-
-Source: https://docs.getroamify.com/gift-cards/update-gift-card/
-
-Endpoint: `PATCH /api/gifts/gift`
-
-Update the details of an existing gift card.
-
----
-
-## Revoke Gift Card
-
-Source: https://docs.getroamify.com/gift-cards/revoke-gift-card/
-
-Endpoint: `DELETE /api/gifts/gift`
-
-Revoke/cancel an existing gift card.
-
----
-
-## Get Gift Card(s)
-
-Source: https://docs.getroamify.com/gift-cards/get-gift-card/
-
-Endpoint: `GET /api/gifts/gift`
-
-Retrieve details of one or more gift cards.
 
 ---
 
