@@ -1,0 +1,300 @@
+import { Callout, Tabs } from 'nextra/components';
+
+# Insurance API - Orders
+
+<Callout type="warning" emoji="⚠️">
+    **Eligibility: Saudi Arabia citizens and residents only.** Insurance packages may only be sold to travellers who are citizens or residents of Saudi Arabia.
+</Callout>
+
+## Table of Contents
+- [Create Insurance Order](#create-insurance-order)
+- [Get Insurance Order](#get-insurance-order)
+- [Get Insurance Orders](#get-insurance-orders)
+
+## Create Insurance Order
+To create an insurance order, you need to send a `POST` request to the `/api/insurance/order` endpoint.
+
+An order **reserves** one policy per unit of quantity and debits your partner balance. It does not issue anything. Each reserved policy comes back with its own `policyId`, which you then issue against a named traveller with [`POST /api/insurance/apply`](/insurance/policies#apply-insurance).
+
+You are required to provide the following parameters in the request body:
+- `items`: An array of insurance items you want to order. At least one item is required. Each item should contain the following details:
+    - `packageId`: The ID of the insurance package you want to order. This is a required field of type `string`.
+    - `quantity`: The number of policies to reserve for this package. This is a required field of type `number`, and must be an integer of at least `1`.
+- `referenceId`: The reference ID for the order. This is an optional field of type `string`. (Your custom reference ID for the order, if needed.)
+
+<Callout type="warning" emoji="⚠️">
+    Every `packageId` must start with `insurance-`. eSIM packages cannot be ordered through this endpoint; use `POST /api/esim/order` for those. The reverse also holds: insurance packages are rejected by the eSIM order endpoints.
+</Callout>
+
+<Callout type="warning" emoji="⚠️">
+    The total quantity across all items in a single order cannot exceed `5`.
+</Callout>
+
+<Callout type="info" emoji="💡">
+    `referenceId` must be unique across your orders. Reusing one returns `409`, which makes it a safe idempotency guard against double submission.
+</Callout>
+
+### Usage - create an insurance order
+Here is an example of how you can create an insurance order using Roamify Insurance API.
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request POST \
+        --url 'https://api-dev.getroamify.com/api/insurance/order' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "items": [
+                {
+                    "packageId": "insurance-saudi-arabia-individual-7days",
+                    "quantity": 1
+                }
+            ],
+            "referenceId": "Optional Reference ID"
+        }'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.post('https://api-dev.getroamify.com/api/insurance/order', {
+            items: [
+                {
+                    packageId: 'insurance-saudi-arabia-individual-7days',
+                    quantity: 1
+                }
+            ],
+            referenceId: 'Optional Reference ID'
+        }, {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Response fields
+- `id`: The ID of the insurance order.
+- `referenceId`: The reference ID you provided, or an empty string.
+- `orderType`: How the order was placed. Always `api` for orders created through this endpoint.
+- `status`: The status of the order.
+- `total`: The total charged for the order.
+- `currency`: The currency of `total`.
+- `createdAt`: The Unix timestamp of when the order was created.
+- `updatedAt`: The Unix timestamp of when the order was last updated.
+- `items`: One entry per reserved policy. Each entry contains:
+    - `policyId`: The ID of the reserved policy. Pass this to `POST /api/insurance/apply`.
+    - `packageId`: The ID of the insurance package that was ordered.
+    - `package`: The display name of the package.
+    - `type`: The service type. Always `insurance`.
+    - `price`: The price of the package.
+    - `currency`: The currency of `price`.
+    - `createdAt`: The Unix timestamp of when the order was created.
+    - `updatedAt`: The Unix timestamp of when the order was last updated.
+
+<Callout type="info" emoji="💡">
+    A `quantity` of `2` produces two entries in `items`, sharing the same `packageId` but each with a distinct `policyId`. Issue each one separately.
+</Callout>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"id": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+		"referenceId": "ref-123456",
+		"orderType": "api",
+		"status": "COMPLETED",
+		"total": 12,
+		"currency": "USD",
+		"createdAt": 1731837535,
+		"updatedAt": 1731837539,
+		"items": [
+			{
+				"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+				"packageId": "insurance-saudi-arabia-individual-7days",
+				"package": "Individual - 7 Days",
+				"type": "insurance",
+				"price": 12,
+				"currency": "USD",
+				"createdAt": 1731837535,
+				"updatedAt": 1731837539
+			}
+		]
+	}
+}
+```
+
+### Errors
+| HTTP status | Message |
+| --- | --- |
+| `400` | Only insurance packages can be ordered through this endpoint. Every packageId must start with 'insurance-'; use POST /esim/order for eSIM packages |
+| `400` | Invalid quantity, please make sure your have provided the correct quantity |
+| `400` | Exceed maximum total quantity of 5, please make sure your have provided the correct quantity and the quantity does not exceed the maximum allowed quantity 5 |
+| `400` | Missing required fields, please provide all required fields according to the documentation |
+| `409` | Order with the same referenceId already exists, please make sure your have provided a unique referenceId |
+| `409` | Insufficient partner balance, please recharge it first before placing order |
+
+## Get Insurance Order
+To get a specific insurance order, you need to send a `GET` request to the `/api/insurance/order` endpoint.
+
+<Callout type="warning" emoji="⚠️">
+    You must provide exactly one of `orderId` or `referenceId`. Providing both, or neither, is a validation error.
+</Callout>
+
+- `orderId`: The ID of the insurance order you want to retrieve. This is a field of type `string`.
+- `referenceId`: The reference ID of the insurance order you want to retrieve. This is a field of type `string`.
+
+### Usage - fetch an insurance order
+Here is an example of how you can get a specific insurance order using Roamify Insurance API.
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/order?orderId=Order ID' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/order?orderId=Order ID', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"id": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+		"referenceId": "ref-123456",
+		"orderType": "api",
+		"status": "COMPLETED",
+		"total": 12,
+		"currency": "USD",
+		"createdAt": 1731837535,
+		"updatedAt": 1731837539,
+		"items": [
+			{
+				"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+				"packageId": "insurance-saudi-arabia-individual-7days",
+				"package": "Individual - 7 Days",
+				"type": "insurance",
+				"price": 12,
+				"currency": "USD",
+				"createdAt": 1731837535,
+				"updatedAt": 1731837539
+			}
+		]
+	}
+}
+```
+
+### Errors
+| HTTP status | Message |
+| --- | --- |
+| `404` | Order not found, please make sure your have provided the correct orderId or referenceId |
+
+<Callout type="info" emoji="💡">
+    This endpoint only resolves insurance orders. An eSIM order ID returns `404` here, even though the order exists.
+</Callout>
+
+## Get Insurance Orders
+To get a list of insurance orders, you need to send a `GET` request to the `/api/insurance/orders` endpoint.
+
+There are no required parameters for this endpoint, but you can provide the following optional parameters:
+- `status`: The status of the insurance orders to return. This is an optional field of type `string`. Matching is exact and case-sensitive.
+- `limit`: The number of insurance orders to return. This is an optional field of type `number`. The default value is `50`.
+
+Orders are returned newest first, sorted by `createdAt` descending. Only orders you placed through the API are included.
+
+### Usage - fetch a list of insurance orders
+Here is an example of how you can get a list of insurance orders using Roamify Insurance API.
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/orders?status=COMPLETED&limit=10' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/orders?status=COMPLETED&limit=10', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"orders": [
+			{
+				"id": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+				"referenceId": "ref-123456",
+				"orderType": "api",
+				"status": "COMPLETED",
+				"total": 12,
+				"currency": "USD",
+				"createdAt": 1731837535,
+				"updatedAt": 1731837539,
+				"items": [
+					{
+						"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+						"packageId": "insurance-saudi-arabia-individual-7days",
+						"package": "Individual - 7 Days",
+						"type": "insurance",
+						"price": 12,
+						"currency": "USD",
+						"createdAt": 1731837535,
+						"updatedAt": 1731837539
+					}
+				]
+			}
+		]
+	}
+}
+```
