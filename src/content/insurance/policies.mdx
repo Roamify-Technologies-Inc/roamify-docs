@@ -1,0 +1,405 @@
+import { Callout, Tabs } from 'nextra/components';
+
+# Insurance API - Policies
+
+<Callout type="warning" emoji="⚠️">
+    **Eligibility: Saudi Arabia citizens and residents only.** Insurance packages may only be sold to travellers who are citizens or residents of Saudi Arabia. Roamify's validation is deliberately looser than any single provider's rule, so an ineligible traveller can pass validation here and still be rejected by the provider at issuance.
+</Callout>
+
+## Table of Contents
+- [Apply Insurance](#apply-insurance)
+- [Get Insurance Policy](#get-insurance-policy)
+- [Get Insurance Policies](#get-insurance-policies)
+- [Policy Statuses](#policy-statuses)
+
+## Apply Insurance
+Ordering an insurance package reserves a policy but does not issue it. To issue a reserved policy against a named traveller, you need to send a `POST` request to the `/api/insurance/apply` endpoint.
+
+You are required to provide the following parameters in the request body:
+- `policyId`: The ID of the reserved policy, returned by [`POST /api/insurance/order`](/insurance/orders#create-insurance-order). This is a required field of type `string`.
+- `startDate`: The coverage start date in `DD/MM/YYYY` format. This is a required field of type `string`.
+- `endDate`: The coverage end date in `DD/MM/YYYY` format. This is a required field of type `string`.
+- `mobile`: The traveller's mobile number. This is a required field of type `string`.
+- `email`: The traveller's email address. This is a required field of type `string`.
+- `insurer`: The primary insured traveller. This is a required field of type `object`, containing:
+    - `firstName`: The traveller's first name. This is a required field of type `string`.
+    - `lastName`: The traveller's last name. This is a required field of type `string`.
+    - `nationality`: The traveller's nationality. This is a required field of type `string`.
+    - `dateOfBirth`: The traveller's date of birth in `DD/MM/YYYY` format. Conditional, see below.
+    - `idNumber`: The traveller's identification number. Conditional, see below.
+    - `passportNumber`: The traveller's passport number. Conditional, see below.
+
+### Which traveller fields are required
+`dateOfBirth`, `idNumber`, and `passportNumber` are conditional. Whether each one is mandatory is decided by the `requirements` object of the package that was purchased, snapshotted onto the policy when the order was created.
+
+Read `requirements` from [`GET /api/insurance/packages`](/insurance/packages) before you build your collection form, or from `GET /api/insurance/policy` for a policy you already hold.
+
+| `requirements` flag | Field it governs | When `true` |
+| --- | --- | --- |
+| `dateOfBirth` | `insurer.dateOfBirth` | Must be supplied |
+| `idNumber` | `insurer.idNumber` | Must be supplied |
+| `passportNumber` | `insurer.passportNumber` | Must be supplied |
+| `phoneNumber` | `mobile` | Must be supplied |
+
+A field the package does not ask for is ignored. A field it does ask for must be present and well formed.
+
+<Callout type="warning" emoji="⚠️">
+    `mobile` and `email` are required on **every** apply call, whatever the `requirements` flags say. The provider issues the policy against a reachable contact.
+</Callout>
+
+### Validation rules
+| Field | Rule |
+| --- | --- |
+| `startDate` | `DD/MM/YYYY`. At least 1 day in the future — coverage cannot start today. |
+| `endDate` | `DD/MM/YYYY`. Must be strictly after `startDate`. Must fit within the purchased package's `day` allowance. |
+| `mobile` | 8 to 15 digits, international format, no leading `+`. For example `966512345678`. |
+| `email` | A valid email address. |
+| `insurer.dateOfBirth` | `DD/MM/YYYY`. Must be in the past, and no more than 120 years ago. |
+| `insurer.idNumber` | 5 to 20 alphanumeric characters. |
+| `insurer.passportNumber` | 5 to 20 alphanumeric characters. |
+
+<Callout type="info" emoji="💡">
+    These rules are intentionally broader than what any one provider accepts. The current Saudi Arabia provider, for example, only accepts a 10-digit Saudi ID and a `966`-prefixed mobile, and enforces that itself at issuance. Passing Roamify's validation does not guarantee the provider will issue the policy.
+</Callout>
+
+### Usage - issue an insurance policy
+Here is an example of how you can issue an insurance policy using Roamify Insurance API.
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request POST \
+        --url 'https://api-dev.getroamify.com/api/insurance/apply' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+            "startDate": "01/08/2026",
+            "endDate": "08/08/2026",
+            "mobile": "966512345678",
+            "email": "traveller@example.com",
+            "insurer": {
+                "firstName": "Fahad",
+                "lastName": "Al Otaibi",
+                "nationality": "Saudi Arabia",
+                "dateOfBirth": "24/06/1990",
+                "idNumber": "1012345678"
+            }
+        }'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.post('https://api-dev.getroamify.com/api/insurance/apply', {
+            policyId: 'b06036c5-eadc-4f88-aa31-8c207fec91ec',
+            startDate: '01/08/2026',
+            endDate: '08/08/2026',
+            mobile: '966512345678',
+            email: 'traveller@example.com',
+            insurer: {
+                firstName: 'Fahad',
+                lastName: 'Al Otaibi',
+                nationality: 'Saudi Arabia',
+                dateOfBirth: '24/06/1990',
+                idNumber: '1012345678'
+            }
+        }, {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+		"orderId": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+		"packageId": "insurance-saudi-arabia-individual-7days",
+		"package": "Individual - 7 Days",
+		"countryName": "Saudi Arabia",
+		"type": "insurance",
+		"status": "ISSUED",
+		"startDate": "01/08/2026",
+		"endDate": "08/08/2026",
+		"insurerName": "Fahad Al Otaibi",
+		"requirements": {
+			"phoneNumber": true,
+			"dateOfBirth": true,
+			"idNumber": true,
+			"passportNumber": false
+		},
+		"coverage": {
+			"insuredType": "individual",
+			"day": 7,
+			"benefits": [
+				"Emergency medical cover up to USD 50,000",
+				"24/7 assistance hotline"
+			]
+		},
+		"policy": {
+			"policyNo": "TRV-2026-000123",
+			"policyIssuanceDate": "2026-07-10",
+			"policyLink": "https://provider.example.com/policies/TRV-2026-000123.pdf"
+		},
+		"createdAt": 1731837535,
+		"updatedAt": 1731837987,
+		"expiredAt": 1765238400
+	}
+}
+```
+
+<Callout type="info" emoji="💡">
+    Policy responses never echo back traveller PII. The identification number, passport number, date of birth, nationality, mobile, and email you submit are not returned. Only `insurerName` and the issued policy document are exposed.
+</Callout>
+
+### Response fields
+- `policyId`: The ID of the policy.
+- `orderId`: The ID of the order the policy was reserved through.
+- `packageId`: The ID of the insurance package.
+- `package`: The display name of the package.
+- `countryName`: The country the policy is associated with.
+- `type`: The service type. Always `insurance`.
+- `status`: The status of the policy. See [Policy Statuses](#policy-statuses).
+- `startDate`: The coverage start date, `DD/MM/YYYY`.
+- `endDate`: The coverage end date, `DD/MM/YYYY`.
+- `insurerName`: The insured traveller's full name.
+- `requirements`: The traveller fields this policy's package requires.
+- `coverage`: The coverage summary, containing `insuredType`, `day`, and `benefits`.
+- `policy`: The issued policy document, or `null` if the policy has not been issued yet. Contains:
+    - `policyNo`: The provider's policy number.
+    - `policyIssuanceDate`: The date the provider issued the policy.
+    - `policyLink`: A link to the policy document. Pass this to your customer.
+- `createdAt`: The Unix timestamp of when the policy was reserved.
+- `updatedAt`: The Unix timestamp of when the policy was last updated.
+- `expiredAt`: The Unix timestamp of when coverage expires, or `-1` if not applicable.
+
+### Errors
+| HTTP status | Message |
+| --- | --- |
+| `400` | This insurance package requires idNumber, please provide insurer.idNumber |
+| `400` | This insurance package requires passportNumber, please provide insurer.passportNumber |
+| `400` | This insurance package requires dateOfBirth, please provide insurer.dateOfBirth in the format DD/MM/YYYY (e.g. 24/06/1990) |
+| `400` | This insurance package requires phoneNumber, please provide mobile in international format without the leading '+' (e.g. 966512345678) |
+| `400` | Invalid traveller name, please provide both insurer.firstName and insurer.lastName |
+| `400` | Invalid nationality, please provide insurer.nationality |
+| `400` | Invalid idNumber, please provide a valid identification number for the traveller |
+| `400` | Invalid passportNumber, please provide a valid passport number for the traveller |
+| `400` | Invalid dateOfBirth, please provide a past date in the format DD/MM/YYYY (e.g. 24/06/1990) |
+| `400` | Invalid mobile, please provide 8 to 15 digits in international format without the leading '+' (e.g. 966512345678) |
+| `400` | Invalid email, please provide a valid email address for the traveller |
+| `400` | Invalid startDate, please provide the coverage start date in the format DD/MM/YYYY (e.g. 01/08/2026) |
+| `400` | Invalid endDate, please provide the coverage end date in the format DD/MM/YYYY (e.g. 08/08/2026) and make sure it is after startDate |
+| `400` | Coverage cannot start today, please provide a startDate at least 1 day in the future |
+| `400` | The requested coverage window is longer than the purchased package allows, please shorten it or buy a longer package |
+| `400` | Insurance details failed validation, please make sure you have provided all the required traveller fields |
+| `404` | Insurance policy not found, please make sure you have provided the correct policyId |
+| `409` | This insurance policy has already been issued and cannot be applied again |
+| `409` | This insurance policy is currently being issued, please retry with GET /insurance/policy?policyId=id after some time |
+| `409` | A policy has already been issued for this reference, please contact support if you believe this is an error |
+| `502` | Failed to issue the insurance policy, please try again later or contact support |
+| `502` | The insurance provider rejected the request, please verify the traveller details and try again |
+
+<Callout type="warning" emoji="⚠️">
+    Applying to a policy that is already `ISSUED`, `ACTIVE`, or `EXPIRED` returns `409`. Issuance is not idempotent — do not blindly retry `POST /api/insurance/apply` on a `409`. Read the message: if the policy is being issued, poll `GET /api/insurance/policy` instead.
+</Callout>
+
+## Get Insurance Policy
+To get a specific insurance policy, you need to send a `GET` request to the `/api/insurance/policy` endpoint.
+
+You are required to provide the following query parameter:
+- `policyId`: The ID of the insurance policy you want to retrieve. This is a required field of type `string`.
+
+Use this endpoint to read the `requirements` for a policy you already hold, and to poll for the issued policy document after a `409` telling you issuance is in progress.
+
+### Usage - fetch an insurance policy
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/policy?policyId=Policy ID' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/policy?policyId=Policy ID', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+		"orderId": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+		"packageId": "insurance-saudi-arabia-individual-7days",
+		"package": "Individual - 7 Days",
+		"countryName": "Saudi Arabia",
+		"type": "insurance",
+		"status": "NEW",
+		"startDate": "",
+		"endDate": "",
+		"insurerName": "",
+		"requirements": {
+			"phoneNumber": true,
+			"dateOfBirth": true,
+			"idNumber": true,
+			"passportNumber": false
+		},
+		"coverage": {
+			"insuredType": "individual",
+			"day": 7,
+			"benefits": [
+				"Emergency medical cover up to USD 50,000",
+				"24/7 assistance hotline"
+			]
+		},
+		"policy": null,
+		"createdAt": 1731837535,
+		"updatedAt": 1731837535,
+		"expiredAt": -1
+	}
+}
+```
+
+### Errors
+| HTTP status | Message |
+| --- | --- |
+| `404` | Insurance policy not found, please make sure you have provided the correct policyId |
+
+<Callout type="info" emoji="💡">
+    A policy belonging to another partner is reported as `404`, not `403`.
+</Callout>
+
+## Get Insurance Policies
+To get a list of insurance policies, you need to send a `GET` request to the `/api/insurance/policies` endpoint.
+
+There are no required parameters for this endpoint, but you can provide the following optional parameters:
+- `orderId`: Return only the policies reserved through this order. This is an optional field of type `string`.
+- `status`: The status of the policies to return. This is an optional field of type `string`. Matching is exact and case-sensitive.
+- `limit`: The number of policies to return. This is an optional field of type `number`. The default value is `50`.
+
+Policies are returned newest first, sorted by `createdAt` descending.
+
+### Usage - fetch a list of insurance policies
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/policies?status=ISSUED&limit=10' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/policies?status=ISSUED&limit=10', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"policies": [
+			{
+				"policyId": "b06036c5-eadc-4f88-aa31-8c207fec91ec",
+				"orderId": "67bbabb7-e893-410a-b0a8-4fa62d347b6c",
+				"packageId": "insurance-saudi-arabia-individual-7days",
+				"package": "Individual - 7 Days",
+				"countryName": "Saudi Arabia",
+				"type": "insurance",
+				"status": "ISSUED",
+				"startDate": "01/08/2026",
+				"endDate": "08/08/2026",
+				"insurerName": "Fahad Al Otaibi",
+				"requirements": {
+					"phoneNumber": true,
+					"dateOfBirth": true,
+					"idNumber": true,
+					"passportNumber": false
+				},
+				"coverage": {
+					"insuredType": "individual",
+					"day": 7,
+					"benefits": [
+						"Emergency medical cover up to USD 50,000",
+						"24/7 assistance hotline"
+					]
+				},
+				"policy": {
+					"policyNo": "TRV-2026-000123",
+					"policyIssuanceDate": "2026-07-10",
+					"policyLink": "https://provider.example.com/policies/TRV-2026-000123.pdf"
+				},
+				"createdAt": 1731837535,
+				"updatedAt": 1731837987,
+				"expiredAt": 1765238400
+			}
+		]
+	}
+}
+```
+
+## Policy Statuses
+A policy's `status` can be any of the following values:
+
+| Status | Meaning |
+| --- | --- |
+| `NEW` | Reserved by an order, not yet issued. Ready for `POST /api/insurance/apply`. |
+| `PENDING` | Issuance is in progress. |
+| `ISSUED` | The provider has issued the policy. The `policy` object is populated. |
+| `ACTIVE` | Coverage is currently in effect. |
+| `EXPIRED` | Coverage has ended. |
+| `CANCELLED` | The policy was cancelled. |
+| `REQUIRE_ACTION` | The policy needs attention before it can proceed. |
+| `UNKNOWN` | The status could not be determined. |
+
+<Callout type="warning" emoji="⚠️">
+    `POST /api/insurance/apply` only accepts a policy that is not already `ISSUED`, `ACTIVE`, or `EXPIRED`. Those three states return `409`.
+</Callout>

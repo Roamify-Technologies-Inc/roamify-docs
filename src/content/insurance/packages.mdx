@@ -1,0 +1,377 @@
+import { Tabs, Callout } from 'nextra/components';
+
+# Insurance API - Package(s)
+
+<Callout type="warning" emoji="⚠️">
+    **Eligibility: Saudi Arabia citizens and residents only.** Insurance packages may only be sold to travellers who are citizens or residents of Saudi Arabia. Check each product's `eligibleNationality` and `eligibleNationCodes` before offering it.
+</Callout>
+
+## Table of Contents
+- [Get Insurance Packages](#get-insurance-packages)
+- [Get a Single Insurance Package](#get-a-single-insurance-package)
+
+## Get Insurance Packages
+To get a list of insurance packages, you need to send a `GET` request to the `/api/insurance/packages` endpoint.
+
+<Callout type="warning" emoji="⚠️">
+    Unlike `/api/esim/packages`, this endpoint is **not paginated**. The insurance catalog is small, so every matching product is returned in a single response. Do not send `page` or `pageSize`.
+</Callout>
+
+<Callout type="warning" emoji="⚠️">
+    `country` and `countryCode` have different meanings. Both must use values returned from `GET /api/insurance/countries`. A value that does not match exactly yields an empty `packages` array, not an error.
+</Callout>
+
+The request query can include the following parameters:
+- `geography`: The geography of the insurance packages. This is an optional field of type `string`. Matching is case-insensitive. It can be any of the following values:
+    - `local`: Local packages
+    - `regional`: Regional packages
+    - `global`: Global packages
+- `country`: Full country name filter. This is an optional field of type `string`. Use the `name` value from `GET /api/insurance/countries`.
+- `countryCode`: ISO country code filter. This is an optional field of type `string`. Use the `code` value from `GET /api/insurance/countries`.
+- `packageId`: The ID of a specific insurance package. This is an optional field of type `string`.
+- `day`: The coverage duration in days. This is an optional field of type `number`, and must be an integer of at least `1`. Only packages whose `day` matches exactly are returned.
+
+<Callout type="info" emoji="💡">
+    Only activated products and activated packages are returned. A product whose packages are all filtered out is omitted from the response entirely.
+</Callout>
+
+## Usage examples
+Here is an example of how you can get a list of insurance packages using Roamify Insurance API.
+
+### Example Request 1: Get all insurance packages
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/packages' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/packages', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+<br />
+
+### Example Request 2: Filter by `countryCode` (ISO code)
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/packages?countryCode=SA' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/packages?countryCode=SA', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+<br />
+
+### Example Request 3: Filter by `country` (full country name)
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/packages?country=Saudi%20Arabia' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/packages?country=Saudi Arabia', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Example Request 4: Filter by coverage duration
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/packages?countryCode=SA&day=7' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/packages?countryCode=SA&day=7', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Response fields
+
+### Product
+Each entry in `packages` is an insurance product:
+- `id`: The ID of the insurance product.
+- `name`: The display name of the product.
+- `slug`: The URL-friendly form of the product name.
+- `countryName`: The full name of the country the product is associated with.
+- `countryCode`: The ISO code of the country the product is associated with.
+- `countrySlug`: The URL-friendly form of the country name.
+- `geography`: The geography scope. One of `local`, `regional`, or `global`.
+- `region`: The region the country belongs to.
+- `description`: A description of the product.
+- `image`: The image URL for the product.
+- `coverages`: The coverage areas included in the product. Array.
+- `insuredType`: The type of traveller the product insures.
+- `eligibleNationality`: The nationalities eligible for this product. Array.
+- `eligibleNationCodes`: The ISO codes of the eligible nationalities. Array.
+- `benefits`: The benefits included in the product. Array.
+- `minPrice`: The lowest package price for this product.
+- `maxPrice`: The highest package price for this product.
+- `packages`: The purchasable packages for this product. Array.
+
+### Package
+Each entry in the product's `packages` array is a purchasable package:
+- `packageId`: The ID you pass to `POST /api/insurance/order`. Always starts with `insurance-`.
+- `package`: The display name of the package.
+- `provider`: The insurance provider that underwrites the policy.
+- `type`: The package type.
+- `charge`: The charge amount for the package, expressed in `currency`.
+- `day`: The number of days of coverage the package allows.
+- `price`: The price of the package, expressed in `currency`.
+- `currency`: The currency of `price` and `charge`. Always `USD`.
+- `requirements`: The traveller fields you must supply when issuing this policy. See below.
+- `notes`: Additional provider notes for the package. Array.
+
+<Callout type="info" emoji="💡">
+    `coverages`, `benefits`, and `notes` are provider-defined. Treat them as opaque display content rather than fields you branch on.
+</Callout>
+
+### Requirements
+The `requirements` object determines which traveller fields `POST /api/insurance/apply` will accept or reject for this package. It is snapshotted onto every policy created from the package, so what you read here is what will be enforced at issuance.
+
+- `phoneNumber`: When `true`, `mobile` must be supplied.
+- `dateOfBirth`: When `true`, `insurer.dateOfBirth` must be supplied.
+- `idNumber`: When `true`, `insurer.idNumber` must be supplied.
+- `passportNumber`: When `true`, `insurer.passportNumber` must be supplied.
+
+<Callout type="warning" emoji="⚠️">
+    `mobile` and `email` are required on every apply call, whatever the `requirements` flags say. The provider issues the policy against a reachable contact.
+</Callout>
+
+Read more about how these flags are enforced on the [Policies](/insurance/policies) page.
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"packages": [
+			{
+				"id": "saudi-arabia-insurance",
+				"name": "Saudi Arabia Travel Insurance",
+				"slug": "saudi-arabia-travel-insurance",
+				"countryName": "Saudi Arabia",
+				"countryCode": "SA",
+				"countrySlug": "saudi-arabia",
+				"geography": "local",
+				"region": "Middle East",
+				"description": "Travel insurance for Saudi Arabia citizens and residents.",
+				"image": "https://imagedelivery.net/uUE6LNs_ci8SFBH4_n66dQ/countries/flags/saudi-arabia/public",
+				"coverages": [
+					"Medical expenses",
+					"Trip cancellation",
+					"Lost baggage"
+				],
+				"insuredType": "individual",
+				"eligibleNationality": [
+					"Saudi Arabia"
+				],
+				"eligibleNationCodes": [
+					"SA"
+				],
+				"benefits": [
+					"Emergency medical cover up to USD 50,000",
+					"24/7 assistance hotline"
+				],
+				"minPrice": 12,
+				"maxPrice": 30,
+				"packages": [
+					{
+						"packageId": "insurance-saudi-arabia-individual-7days",
+						"package": "Individual - 7 Days",
+						"provider": "tree",
+						"type": "individual",
+						"charge": 12,
+						"day": 7,
+						"price": 12,
+						"currency": "USD",
+						"requirements": {
+							"phoneNumber": true,
+							"dateOfBirth": true,
+							"idNumber": true,
+							"passportNumber": false
+						},
+						"notes": []
+					}
+				]
+			}
+		]
+	}
+}
+```
+
+## Get a Single Insurance Package
+To get one insurance package by its ID, you need to send a `GET` request to the `/api/insurance/package` endpoint.
+
+You are required to provide the following query parameter:
+- `packageId`: The ID of the insurance package you want to retrieve. This is a required field of type `string`.
+
+The response is the full product the package belongs to, with its `packages` array narrowed to the single package you requested.
+
+### Usage - fetch a single insurance package
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/package?packageId=insurance-saudi-arabia-individual-7days' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/package?packageId=insurance-saudi-arabia-individual-7days', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"id": "saudi-arabia-insurance",
+		"name": "Saudi Arabia Travel Insurance",
+		"slug": "saudi-arabia-travel-insurance",
+		"countryName": "Saudi Arabia",
+		"countryCode": "SA",
+		"countrySlug": "saudi-arabia",
+		"geography": "local",
+		"region": "Middle East",
+		"description": "Travel insurance for Saudi Arabia citizens and residents.",
+		"image": "https://imagedelivery.net/uUE6LNs_ci8SFBH4_n66dQ/countries/flags/saudi-arabia/public",
+		"coverages": [
+			"Medical expenses",
+			"Trip cancellation",
+			"Lost baggage"
+		],
+		"insuredType": "individual",
+		"eligibleNationality": [
+			"Saudi Arabia"
+		],
+		"eligibleNationCodes": [
+			"SA"
+		],
+		"benefits": [
+			"Emergency medical cover up to USD 50,000",
+			"24/7 assistance hotline"
+		],
+		"minPrice": 12,
+		"maxPrice": 30,
+		"packages": [
+			{
+				"packageId": "insurance-saudi-arabia-individual-7days",
+				"package": "Individual - 7 Days",
+				"provider": "tree",
+				"type": "individual",
+				"charge": 12,
+				"day": 7,
+				"price": 12,
+				"currency": "USD",
+				"requirements": {
+					"phoneNumber": true,
+					"dateOfBirth": true,
+					"idNumber": true,
+					"passportNumber": false
+				},
+				"notes": []
+			}
+		]
+	}
+}
+```
+
+### Errors
+| HTTP status | Message |
+| --- | --- |
+| `404` | Insurance package not found, please make sure you have provided a valid packageId |
+| `500` | Failed to get insurance packages, please try again later |

@@ -1,0 +1,119 @@
+import { Tabs, Callout } from 'nextra/components';
+
+# Insurance API - Supported Countries
+
+<Callout type="warning" emoji="⚠️">
+    **Eligibility: Saudi Arabia citizens and residents only.** Insurance packages may only be sold to travellers who are citizens or residents of Saudi Arabia, regardless of which countries this endpoint returns.
+</Callout>
+
+## Table of Contents
+- [Get Insurance Countries](#get-insurance-countries)
+
+## Get Insurance Countries
+To get a list of countries covered by the insurance catalog, you need to send a `GET` request to the `/api/insurance/countries` endpoint.
+
+There are no required parameters for this endpoint.
+
+Optional query parameters:
+- `geography`: Filter countries by geography scope. This is an optional field of type `string`. Matching is case-insensitive. Accepted values:
+    - `local`
+    - `regional`
+    - `global`
+
+<Callout type="warning" emoji="⚠️">
+Use the returned `name` and `code` from this endpoint when querying `/api/insurance/packages`.
+For package filters:
+- `country` must use `name`
+- `countryCode` must use `code`
+Arbitrary country strings are not accepted, and a value that does not match exactly returns an empty `packages` array rather than an error.
+</Callout>
+
+<Callout type="info" emoji="💡">
+    Only countries that have at least one activated insurance product are returned. Results are deduplicated by `code` and sorted alphabetically by `name`.
+</Callout>
+
+## Usage - fetch a list of insurance supported countries
+Here is an example of how you can get a list of countries using Roamify Insurance API.
+
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/countries' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/countries', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Usage - fetch countries by geography (optional)
+<Tabs items={['curl', 'javascript']}>
+    <Tabs.Tab index={0}>
+        ```bash
+        curl --request GET \
+        --url 'https://api-dev.getroamify.com/api/insurance/countries?geography=local' \
+        --header 'Authorization: Bearer {{token}}' \
+        --header 'Content-Type: application/json'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab index={1}>
+        ```javascript
+        const axios = require('axios');
+
+        axios.get('https://api-dev.getroamify.com/api/insurance/countries?geography=local', {
+            headers: {
+                'Authorization': 'Bearer {access token here}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Response fields
+Each entry in `countries` contains:
+- `code`: The ISO country code. Use this as `countryCode` on `/api/insurance/packages`.
+- `name`: The full country name. Use this as `country` on `/api/insurance/packages`.
+- `slug`: The URL-friendly form of the country name.
+- `geography`: The geography scope of the country. One of `local`, `regional`, or `global`.
+
+## Sample Response
+```json
+{
+	"status": "success",
+	"data": {
+		"countries": [
+			{
+				"code": "SA",
+				"name": "Saudi Arabia",
+				"slug": "saudi-arabia",
+				"geography": "local"
+			}
+		]
+	}
+}
+```
