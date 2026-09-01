@@ -6,6 +6,7 @@ export default {
     "topup-flow": "Top-up Flow",
     "esims": "eSIMs",
     "esims-link": "eSIM Link",
+    "vouchers": "Vouchers",
     "events": "eSIM Events",
     "compatible-devices": "Compatible Devices",
     "balance": "Balance",
